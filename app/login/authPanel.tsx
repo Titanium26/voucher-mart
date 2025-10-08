@@ -204,7 +204,7 @@ export default function AuthPanel() {
                   </div>
 
                   <div className="sm:col-span-2">
-                    <label className="block text-sm mb-1">Email (username)</label>
+                    <label className="block text-sm mb-1">Email</label>
                     <input
                       name="email"
                       type="email"
