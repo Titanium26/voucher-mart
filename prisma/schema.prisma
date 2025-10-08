@@ -1,0 +1,53 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+}
+
+model User {
+  id               Int        @id @default(autoincrement())
+  username         String     @unique
+  email            String     @unique
+  passwordHash     String
+  emailVerified    DateTime?
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  lastLoginAt      DateTime?
+  failedLoginCount Int        @default(0)
+  status           UserStatus @default(INACTIVE)
+
+  tokens           Token[]
+  sessions         Session[]  
+
+}
+
+model Token {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  kind       String   // "EMAIL_VERIFY"
+  tokenHash  String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+
+  user       User     @relation(fields: [userId], references: [id])
+}
+
+model Session {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  tokenHash  String   // sha256(rawToken)
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+
+  user       User     @relation(fields: [userId], references: [id])
+  @@index([userId])
+  @@index([tokenHash])
+}
